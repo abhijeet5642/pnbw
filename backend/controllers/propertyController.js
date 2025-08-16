@@ -50,7 +50,7 @@ const createProperty = async (req, res) => {
   } = req.body;
 
   try {
-    const property = new Property({
+    const property = await Property.create({
       title,
       description,
       price,
@@ -61,9 +61,7 @@ const createProperty = async (req, res) => {
       images,
       agent: req.user._id,
     });
-
-    const createdProperty = await property.save();
-    res.status(201).json(createdProperty);
+    res.status(201).json(property);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

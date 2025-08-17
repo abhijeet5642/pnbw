@@ -18,6 +18,7 @@ import AdminLayout from './pages/Admin/AdminLayout.jsx';
 import Dashboard from './pages/Admin/Dashboard.jsx';
 import UserManagement from './pages/Admin/UserManagement.jsx';
 import PropertyManagement from './pages/Admin/PropertyManagement.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
 
 import './styles/styles.css';
 import './index.css';
@@ -52,9 +53,9 @@ export default function App() {
           <Route
             path="/admin/*"
             element={
-              <RequireAuth>
+              <AdminRoute>
                 <AdminLayout />
-              </RequireAuth>
+              </AdminRoute>
             }
           >
             <Route index element={<Dashboard />} />

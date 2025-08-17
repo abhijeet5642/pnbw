@@ -22,8 +22,6 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
     amenities: [],
     submittedBy: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState('');
   const [newAmenity, setNewAmenity] = useState('');
   const [currentStep, setCurrentStep] = useState(1); // New state for tabs
 
@@ -90,47 +88,12 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
   const handleNextStep = () => setCurrentStep(prev => prev + 1);
   const handlePrevStep = () => setCurrentStep(prev => prev - 1);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setFeedback('');
-
-    console.log('New Property Data:', formData);
-    try {
-      const newProperty = {
-        id: `prop-${Date.now()}`,
-        ...formData,
-        price: parseFloat(formData.price) || 0,
-        units: parseFloat(formData.units) || 0,
-        bedrooms: parseInt(formData.bedrooms) || null,
-        bathrooms: parseInt(formData.bathrooms) || null,
-        builtYear: parseInt(formData.builtYear) || null,
-        images: formData.images.map(file => URL.createObjectURL(file)),
-        published: false,
-        active: false,
-        popular: false,
-        createdAt: Date.now(),
-        views: 0,
-      };
-
-      setTimeout(() => {
-        onAddProperty(newProperty);
-        setFeedback('success');
-        setFormData({
-          title: '', description: '', propertyType: 'Apartment', price: '', units: '',
-          bedrooms: '', bathrooms: '', furnishing: 'Unfurnished', possession: 'Immediate',
-          builtYear: '', locality: '', city: '', images: [], videoUrls: [], lat: '', lng: '',
-          amenities: [], submittedBy: '',
-        });
-        setTimeout(onClose, 2000);
-      }, 1500);
-
-    } catch (err) {
-      console.error('Failed to add property:', err);
-      setFeedback('error');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // The parent component (`PropertyManagement`) is responsible for handling
+    // the form submission, including the API call and state updates.
+    // This modal simply passes the collected form data upwards.
+    onAddProperty(formData);
   };
 
   return (
@@ -140,7 +103,6 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
           title="Close"
-          disabled={isSubmitting}
         >
           <X size={24} />
         </button>
@@ -161,13 +123,13 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 <label htmlFor="title" className="block text-gray-700 text-sm font-semibold">Property Name/Title <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <Home size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="text" id="title" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Luxury Apartment" value={formData.title} onChange={handleChange} required disabled={isSubmitting} />
+                  <input type="text" id="title" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Luxury Apartment" value={formData.title} onChange={handleChange} required />
                 </div>
 
                 <label htmlFor="propertyType" className="block text-gray-700 text-sm font-semibold">Property Type <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <Grid size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <select id="propertyType" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-blue-500 focus:border-blue-500" value={formData.propertyType} onChange={handleChange} required disabled={isSubmitting}>
+                  <select id="propertyType" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-blue-500 focus:border-blue-500" value={formData.propertyType} onChange={handleChange} required>
                     {propertyTypes.map(type => <option key={type} value={type}>{type}</option>)}
                   </select>
                 </div>
@@ -175,7 +137,7 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 <label htmlFor="description" className="block text-gray-700 text-sm font-semibold">Description <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <Info size={20} className="absolute left-3 top-4 text-gray-500" />
-                  <textarea id="description" rows="5" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="Provide a detailed description of the property..." value={formData.description} onChange={handleChange} required disabled={isSubmitting}></textarea>
+                  <textarea id="description" rows="5" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="Provide a detailed description of the property..." value={formData.description} onChange={handleChange} required></textarea>
                 </div>
               </div>
 
@@ -183,25 +145,25 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 <label htmlFor="price" className="block text-gray-700 text-sm font-semibold">Price (in Rupees) <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <DollarSign size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="number" id="price" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 6200000" value={formData.price} onChange={handleChange} required disabled={isSubmitting} />
+                  <input type="number" id="price" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 6200000" value={formData.price} onChange={handleChange} required />
                 </div>
                 
                 <label htmlFor="units" className="block text-gray-700 text-sm font-semibold">Area (Sq. Ft.) <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <Square size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="number" id="units" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 1200" value={formData.units} onChange={handleChange} required disabled={isSubmitting} />
+                  <input type="number" id="units" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 1200" value={formData.units} onChange={handleChange} required />
                 </div>
 
                 <label htmlFor="locality" className="block text-gray-700 text-sm font-semibold">Locality <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <MapPin size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="text" id="locality" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Indirapuram" value={formData.locality} onChange={handleChange} required disabled={isSubmitting} />
+                  <input type="text" id="locality" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Indirapuram" value={formData.locality} onChange={handleChange} required />
                 </div>
                 
                 <label htmlFor="city" className="block text-gray-700 text-sm font-semibold">City <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <MapPin size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="text" id="city" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Ghaziabad" value={formData.city} onChange={handleChange} required disabled={isSubmitting} />
+                  <input type="text" id="city" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Ghaziabad" value={formData.city} onChange={handleChange} required />
                 </div>
               </div>
             </div>
@@ -213,35 +175,35 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 <label htmlFor="bedrooms" className="block text-gray-700 text-sm font-semibold">Bedrooms</label>
                 <div className="relative">
                   <Bed size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="number" id="bedrooms" min="0" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 3" value={formData.bedrooms} onChange={handleChange} disabled={isSubmitting} />
+                  <input type="number" id="bedrooms" min="0" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 3" value={formData.bedrooms} onChange={handleChange} />
                 </div>
 
                 <label htmlFor="bathrooms" className="block text-gray-700 text-sm font-semibold">Bathrooms</label>
                 <div className="relative">
                   <Bath size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="number" id="bathrooms" min="0" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 2" value={formData.bathrooms} onChange={handleChange} disabled={isSubmitting} />
+                  <input type="number" id="bathrooms" min="0" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 2" value={formData.bathrooms} onChange={handleChange} />
                 </div>
                 
                 <label htmlFor="furnishing" className="block text-gray-700 text-sm font-semibold">Furnishing</label>
-                <select id="furnishing" className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-blue-500 focus:border-blue-500" value={formData.furnishing} onChange={handleChange} disabled={isSubmitting}>
+                <select id="furnishing" className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-blue-500 focus:border-blue-500" value={formData.furnishing} onChange={handleChange}>
                   {furnishingOptions.map(option => <option key={option} value={option}>{option}</option>)}
                 </select>
                 
                 <label htmlFor="possession" className="block text-gray-700 text-sm font-semibold">Possession</label>
-                <select id="possession" className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-blue-500 focus:border-blue-500" value={formData.possession} onChange={handleChange} disabled={isSubmitting}>
+                <select id="possession" className="w-full p-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:ring-blue-500 focus:border-blue-500" value={formData.possession} onChange={handleChange}>
                   {possessionOptions.map(option => <option key={option} value={option}>{option}</option>)}
                 </select>
                 
                 <label htmlFor="builtYear" className="block text-gray-700 text-sm font-semibold">Built Year</label>
                 <div className="relative">
                   <Calendar size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="number" id="builtYear" min="1900" max={new Date().getFullYear()} className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 2020" value={formData.builtYear} onChange={handleChange} disabled={isSubmitting} />
+                  <input type="number" id="builtYear" min="1900" max={new Date().getFullYear()} className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 2020" value={formData.builtYear} onChange={handleChange} />
                 </div>
 
                 <label htmlFor="submittedBy" className="block text-gray-700 text-sm font-semibold">Submitted By (Broker Name)</label>
                 <div className="relative">
                   <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="text" id="submittedBy" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., John Doe" value={formData.submittedBy} onChange={handleChange} disabled={isSubmitting} />
+                  <input type="text" id="submittedBy" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., John Doe" value={formData.submittedBy} onChange={handleChange} />
                 </div>
               </div>
 
@@ -256,7 +218,6 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                         checked={formData.amenities.includes(amenity)}
                         onChange={handleChange}
                         className="form-checkbox h-4 w-4 text-blue-600 rounded mr-1"
-                        disabled={isSubmitting}
                       />
                       {amenity}
                     </label>
@@ -269,9 +230,8 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                     placeholder="Add custom amenity"
                     value={newAmenity}
                     onChange={(e) => setNewAmenity(e.target.value)}
-                    disabled={isSubmitting}
                   />
-                  <button type="button" onClick={handleAddAmenity} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors" disabled={isSubmitting}>
+                  <button type="button" onClick={handleAddAmenity} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
                     <PlusCircle size={20} />
                   </button>
                 </div>
@@ -294,7 +254,7 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
               <div className="space-y-4">
                 <label className="block text-gray-700 text-sm font-semibold">Property Images</label>
                 <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                  <input type="file" id="images" multiple accept="image/*" className="absolute opacity-0 w-full h-full cursor-pointer" onChange={handleChange} disabled={isSubmitting} />
+                  <input type="file" id="images" multiple accept="image/*" className="absolute opacity-0 w-full h-full cursor-pointer" onChange={handleChange} />
                   <Upload size={48} className="text-gray-400 mb-2" />
                   <span className="text-gray-600 font-semibold text-center">Drag & Drop or Click to Upload</span>
                   <span className="text-sm text-gray-500 text-center">Images must be in JPG, PNG, or GIF format.</span>
@@ -313,7 +273,7 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 <label className="block text-gray-700 text-sm font-semibold">Video URLs</label>
                 <div className="flex items-center gap-2">
                   <input type="text" id="videoUrlInput" className="flex-1 p-3 border border-gray-300 rounded-lg text-gray-900" placeholder="Paste video URL here" />
-                  <button type="button" onClick={handleAddVideoUrl} className="p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors" disabled={isSubmitting}>
+                  <button type="button" onClick={handleAddVideoUrl} className="p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
                     <PlusCircle size={20} />
                   </button>
                 </div>
@@ -333,11 +293,11 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 <label className="block text-gray-700 text-sm font-semibold">Map Location (Latitude, Longitude)</label>
                 <div className="relative">
                   <MapPin size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="text" id="lat" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="Latitude" value={formData.lat} onChange={handleChange} disabled={isSubmitting} />
+                  <input type="text" id="lat" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="Latitude" value={formData.lat} onChange={handleChange} />
                 </div>
                 <div className="relative">
                   <MapPin size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input type="text" id="lng" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="Longitude" value={formData.lng} onChange={handleChange} disabled={isSubmitting} />
+                  <input type="text" id="lng" className="w-full p-3 pl-10 border border-gray-300 rounded-lg text-gray-900 focus:ring-blue-500 focus:border-blue-500" placeholder="Longitude" value={formData.lng} onChange={handleChange} />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
                   * Use a tool like Google Maps to get precise coordinates.
@@ -356,7 +316,6 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 type="button"
                 onClick={handlePrevStep}
                 className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition shadow-md font-semibold"
-                disabled={isSubmitting}
               >
                 Previous
               </button>
@@ -366,7 +325,6 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 type="button"
                 onClick={handleNextStep}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md font-semibold ml-auto"
-                disabled={isSubmitting}
               >
                 Next
               </button>
@@ -375,9 +333,8 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
               <button
                 type="submit"
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md font-semibold ml-auto"
-                disabled={isSubmitting}
               >
-                {isSubmitting ? 'Adding Property...' : 'Add Property'}
+                Add Property
               </button>
             )}
             {currentStep === 1 && (
@@ -385,14 +342,11 @@ export default function AddPropertyModal({ onClose, onAddProperty }) {
                 type="button"
                 onClick={onClose}
                 className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition shadow-md font-semibold"
-                disabled={isSubmitting}
               >
                 Cancel
               </button>
             )}
           </div>
-          {feedback === 'success' && <p className="text-green-600 text-sm text-center mt-4">Property added successfully (simulated)!</p>}
-          {feedback === 'error' && <p className="text-red-600 text-sm text-center mt-4">Failed to add property (simulated).</p>}
         </form>
       </div>
     </div>

@@ -22,8 +22,13 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      await login(formData);
-      navigate('/'); // Redirect to homepage on successful login
+      const user = await login(formData);
+      // Check the user's role and redirect accordingly
+      if (user && user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Login failed. Please check your credentials.';
       setError(errorMessage);
